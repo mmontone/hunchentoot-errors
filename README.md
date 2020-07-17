@@ -6,7 +6,7 @@ Augments Hunchentoot error pages and logs with request and session information
 
 Subclass your acceptor from `HUNCHENTOOT-ERRORS:ERRORS-ACCEPTOR`.
 
-When `hunchentoot:*log-lisp-errors* is on, you get HTTP request and session information printed in errors pages and logs, like:
+When `hunchentoot:*show-lisp-errors*` is on, you get HTTP request and session information printed in errors pages and logs, like:
 
 ```
 Backtrace for: #<SB-THREAD:THREAD "hunchentoot-worker-127.0.0.1:46428" RUNNING {1002007DE3}>
