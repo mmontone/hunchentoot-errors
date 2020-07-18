@@ -4,7 +4,7 @@
   :license  "MIT"
   :version "0.0.1"
   :serial t
-  :depends-on (#:hunchentoot #:string-case)
+  :depends-on (#:hunchentoot #:string-case #:parse-number)
   :components ((:file "package")
                (:file "mimeparse")
                (:file "hunchentoot-errors")))
