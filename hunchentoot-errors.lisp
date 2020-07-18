@@ -65,26 +65,30 @@
                ("application/lisp" :sexp))))
       :text))
 
+(defgeneric acceptor-log-error (stream acceptor log-level format-string &rest format-arguments))
+
+(defmethod acceptor-log-error (stream (acceptor errors-acceptor) log-level format-string &rest format-arguments)
+  (format stream "[~A~@[ [~A]~]] ~?~%"
+          (hunchentoot::iso-time) log-level
+          format-string format-arguments)
+  (format stream "HTTP REQUEST:~%")
+  (print-request *request* :text-log stream)
+  (format stream "~%SESSION:~%")
+  (print-session *session* :text-log stream)
+  (terpri stream))
+
 (defmethod acceptor-log-message ((acceptor errors-acceptor) log-level format-string &rest format-arguments)
   "Sends a formatted message to the destination denoted by (ACCEPTOR-MESSAGE-LOG-DESTINATION ACCEPTOR).
 FORMAT and ARGS are as in FORMAT.
 LOG-LEVEL is a keyword denoting the log level or NIL in which case it is ignored."
   (hunchentoot::with-log-stream (stream (acceptor-message-log-destination acceptor) hunchentoot::*message-log-lock*)
     (handler-case
-        (progn
-          (format stream "[~A~@[ [~A]~]] ~?~%"
-                  (hunchentoot::iso-time) log-level
-                  format-string format-arguments)
-          (format stream "HTTP REQUEST:~%")
-          (print-request *request* :text-log stream)
-          (format stream "~%SESSION:~%")
-          (print-session *session* :text-log stream)
-          (terpri stream))
+        (apply #'acceptor-log-error stream acceptor log-level format-string format-arguments)
       (error (e)
         (ignore-errors
          (format *trace-output* "error ~A while writing to error log, error not logged~%" e))))))
 
-(defmethod acceptor-status-message :around ((acceptor errors-acceptor) http-status-code &key &allow-other-keys)
+(defmethod acceptor-status-message ((acceptor errors-acceptor) http-status-code &key &allow-other-keys)
   (concatenate 'string (call-next-method)
     (if *show-lisp-errors-p*
       (with-output-to-string (msg)
