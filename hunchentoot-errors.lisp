@@ -1,7 +1,18 @@
 (in-package #:hunchentoot-errors)
 
 (defclass errors-acceptor (acceptor)
-  ())
+  ((log-request :initarg :log-request
+                :accessor log-requestp
+                :initform t)
+   (debug-request :initarg :debug-request
+                  :accessor debug-requestp
+                  :initform t)
+   (log-session :initarg :log-session
+                :accessor log-sessionp
+                :initform t)
+   (debug-session :initarg :debug-session
+                  :accessor debug-sessionp
+                  :initform t)))
 
 (defgeneric print-request (request format stream)
   (:documentation "Prints REQUEST to STREAM in FORMAT"))
@@ -71,10 +82,12 @@
   (format stream "[~A~@[ [~A]~]] ~?~%"
           (hunchentoot::iso-time) log-level
           format-string format-arguments)
-  (format stream "HTTP REQUEST:~%")
-  (print-request *request* :text-log stream)
-  (format stream "~%SESSION:~%")
-  (print-session *session* :text-log stream)
+  (when (log-requestp acceptor)
+    (format stream "HTTP REQUEST:~%")
+    (print-request *request* :text-log stream))
+  (when (log-sessionp acceptor)
+    (format stream "~%SESSION:~%")
+    (print-session *session* :text-log stream))
   (terpri stream))
 
 (defmethod acceptor-log-message ((acceptor errors-acceptor) log-level format-string &rest format-arguments)
@@ -93,6 +106,8 @@ LOG-LEVEL is a keyword denoting the log level or NIL in which case it is ignored
     (if *show-lisp-errors-p*
       (with-output-to-string (msg)
         (let ((format (accept-format)))
-          (print-request *request* format msg)
-          (print-session *session* format msg))))
+          (when (debug-requestp acceptor)
+            (print-request *request* format msg))
+          (when (debug-sessionp acceptor)
+            (print-session *session* format msg)))))
     ""))
