@@ -82,10 +82,12 @@
   (format stream "[~A~@[ [~A]~]] ~?~%"
           (hunchentoot::iso-time) log-level
           format-string format-arguments)
-  (when (log-requestp acceptor)
+  (when (and (log-requestp acceptor)
+             (boundp '*request*))
     (format stream "HTTP REQUEST:~%")
     (print-request *request* :text-log stream))
-  (when (log-sessionp acceptor)
+  (when (and (log-sessionp acceptor)
+             (boundp '*session*))
     (format stream "~%SESSION:~%")
     (print-session *session* :text-log stream))
   (terpri stream))
@@ -102,12 +104,16 @@ LOG-LEVEL is a keyword denoting the log level or NIL in which case it is ignored
          (format *trace-output* "error ~A while writing to error log, error not logged~%" e))))))
 
 (defmethod acceptor-status-message ((acceptor errors-acceptor) http-status-code &key &allow-other-keys)
-  (concatenate 'string (call-next-method)
-    (if *show-lisp-errors-p*
-      (with-output-to-string (msg)
-        (let ((format (accept-format)))
-          (when (debug-requestp acceptor)
-            (print-request *request* format msg))
-          (when (debug-sessionp acceptor)
-            (print-session *session* format msg)))))
-    ""))
+  (concatenate
+   'string
+   (call-next-method)
+   (if *show-lisp-errors-p*
+       (with-output-to-string (msg)
+         (let ((format (accept-format)))
+           (when (and (debug-requestp acceptor)
+                      (boundp '*request*))
+             (print-request *request* format msg))
+           (when (and (debug-sessionp acceptor)
+                      (boundp '*session*))
+             (print-session *session* format msg)))))
+   ""))
