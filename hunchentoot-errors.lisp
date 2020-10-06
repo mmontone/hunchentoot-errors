@@ -104,10 +104,11 @@ LOG-LEVEL is a keyword denoting the log level or NIL in which case it is ignored
          (format *trace-output* "error ~A while writing to error log, error not logged~%" e))))))
 
 (defmethod acceptor-status-message ((acceptor errors-acceptor) http-status-code &key &allow-other-keys)
-  (concatenate
-   'string
-   (call-next-method)
-   (if *show-lisp-errors-p*
+  (if (not *show-lisp-errors-p*)
+      (call-next-method)
+      (concatenate
+       'string
+       (call-next-method)
        (with-output-to-string (msg)
          (let ((format (accept-format)))
            (when (and (debug-requestp acceptor)
@@ -115,5 +116,4 @@ LOG-LEVEL is a keyword denoting the log level or NIL in which case it is ignored
              (print-request *request* format msg))
            (when (and (debug-sessionp acceptor)
                       (boundp '*session*))
-             (print-session *session* format msg)))))
-   ""))
+             (print-session *session* format msg)))))))
