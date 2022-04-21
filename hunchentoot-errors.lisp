@@ -3,16 +3,20 @@
 (defclass errors-acceptor (acceptor)
   ((log-request :initarg :log-request
                 :accessor log-requestp
-                :initform t)
+                :initform t
+		:documentation "When enabled, request information is written to the log.")
    (debug-request :initarg :debug-request
                   :accessor debug-requestp
-                  :initform t)
+                  :initform t
+		  :documentation "When enabled, request information is printed in Hunchentoot status error pages.")
    (log-session :initarg :log-session
                 :accessor log-sessionp
-                :initform t)
+                :initform t
+		:documentation "When enabled, session information is written to the log.")
    (debug-session :initarg :debug-session
                   :accessor debug-sessionp
-                  :initform t)))
+                  :initform t
+		  :documentation "When enabled, session information is printed in Hunchentoot status error pages.")))
 
 (defgeneric print-request (request format stream)
   (:documentation "Prints REQUEST to STREAM in FORMAT"))
@@ -86,9 +90,12 @@
 (defgeneric acceptor-log-error (stream acceptor log-level format-string &rest format-arguments))
 
 (defmethod acceptor-log-error (stream (acceptor errors-acceptor) log-level format-string &rest format-arguments)
+  ;; This snippet is from original Hunchentoot:
   (format stream "[~A~@[ [~A]~]] ~?~%"
           (hunchentoot::iso-time) log-level
           format-string format-arguments)
+
+  ;; This part is hunchentoot-errors specific:
   (when (and (log-requestp acceptor)
              (boundp '*request*))
     (format stream "HTTP REQUEST:~%")
