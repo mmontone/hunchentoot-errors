@@ -112,12 +112,15 @@
   "Sends a formatted message to the destination denoted by (ACCEPTOR-MESSAGE-LOG-DESTINATION ACCEPTOR).
 FORMAT and ARGS are as in FORMAT.
 LOG-LEVEL is a keyword denoting the log level or NIL in which case it is ignored."
-  (hunchentoot::with-log-stream (stream (acceptor-message-log-destination acceptor) hunchentoot::*message-log-lock*)
-    (handler-case
-        (apply #'acceptor-log-error stream acceptor log-level format-string format-arguments)
-      (error (e)
-        (ignore-errors
-         (format *trace-output* "error ~A while writing to error log, error not logged~%" e))))))
+  (if (not (eq log-level :error))
+      (call-next-method)
+      ;; else
+      (hunchentoot::with-log-stream (stream (acceptor-message-log-destination acceptor) hunchentoot::*message-log-lock*)
+	(handler-case
+            (apply #'acceptor-log-error stream acceptor log-level format-string format-arguments)
+	  (error (e)
+            (ignore-errors
+             (format *trace-output* "error ~A while writing to error log, error not logged~%" e)))))))
 
 (defmethod acceptor-status-message ((acceptor errors-acceptor) http-status-code &key &allow-other-keys)
   (if (not *show-lisp-errors-p*)
