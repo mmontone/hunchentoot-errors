@@ -16,7 +16,8 @@
    (debug-session :initarg :debug-session
                   :accessor debug-sessionp
                   :initform t
-                  :documentation "When enabled, session information is printed in Hunchentoot status error pages.")))
+                  :documentation "When enabled, session information is printed in Hunchentoot status error pages."))
+  (:documentation "Subclasses of this acceptor augment Hunchentoot error pages and logs with request and session information."))
 
 (defgeneric print-request (request format stream)
   (:documentation "Prints REQUEST to STREAM in FORMAT"))
