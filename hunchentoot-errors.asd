@@ -8,7 +8,6 @@
      (uiop:subpathname *load-pathname* "README.md"))
   :version "0.0.1"
   :serial t
-  :depends-on (#:hunchentoot #:string-case #:parse-number)
+  :depends-on (#:hunchentoot #:string-case #:parse-number #:cl-mimeparse)
   :components ((:file "package")
-               (:file "mimeparse")
                (:file "hunchentoot-errors")))

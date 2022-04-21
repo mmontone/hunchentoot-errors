@@ -4,19 +4,19 @@
   ((log-request :initarg :log-request
                 :accessor log-requestp
                 :initform t
-		:documentation "When enabled, request information is written to the log.")
+                :documentation "When enabled, request information is written to the log.")
    (debug-request :initarg :debug-request
                   :accessor debug-requestp
                   :initform t
-		  :documentation "When enabled, request information is printed in Hunchentoot status error pages.")
+                  :documentation "When enabled, request information is printed in Hunchentoot status error pages.")
    (log-session :initarg :log-session
                 :accessor log-sessionp
                 :initform t
-		:documentation "When enabled, session information is written to the log.")
+                :documentation "When enabled, session information is written to the log.")
    (debug-session :initarg :debug-session
                   :accessor debug-sessionp
                   :initform t
-		  :documentation "When enabled, session information is printed in Hunchentoot status error pages.")))
+                  :documentation "When enabled, session information is printed in Hunchentoot status error pages.")))
 
 (defgeneric print-request (request format stream)
   (:documentation "Prints REQUEST to STREAM in FORMAT"))
@@ -52,7 +52,7 @@
   (format stream "<p><b>Method:</b> ~a</p>~%" (request-method request))
   (format stream "<p><b>Headers:</b>~%<ul>")
   (loop for (key . value) in (hunchentoot:headers-in request)
-	do (format stream "<li><i>~a:</i> ~a</li>~%" key value))
+        do (format stream "<li><i>~a:</i> ~a</li>~%" key value))
   (format stream "</ul></p>")
   (when (member (request-method request) '(:patch :post))
     (format stream "<p><b>Post parameters:</b>~%<ul>")
@@ -70,7 +70,7 @@
 
 (defun accept-format (&optional (content-type (hunchentoot:header-in "accept" *request*)))
   (or (and content-type
-           (let ((accepts (best-match
+           (let ((accepts (mimeparse:best-match
                            (list "text/lisp"
                                  "application/lisp"
                                  "text/xml"
