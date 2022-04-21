@@ -32,7 +32,7 @@
 
 (defmethod print-session ((session session) (format (eql :text-log)) stream)
   (loop for (key . value) in (hunchentoot::session-data session)
-        do (format stream "  ~a: ~s~%" key value)))
+        do (format stream "  ~s: ~s~%" key value)))
 
 (defmethod print-request ((request request) (format (eql :text-log)) stream)
   (format stream "  uri: ~a~%" (request-uri request))
