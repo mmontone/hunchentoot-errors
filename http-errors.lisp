@@ -1,5 +1,11 @@
 ;; Signal and handle HTTP errors
 
+;; Example usage:
+
+;; (hunchentoot-errors:with-http-error-handler
+;;   (hunchentoot-errors:http-error hunchentoot:+http-bad-request+
+;;                                  "Bad argument: FOO"))
+
 (in-package :hunchentoot-errors)
 
 (define-condition http-error (simple-error)
@@ -21,8 +27,18 @@
       (funcall func)
     (http-error (http-error)
       (setf (hunchentoot:return-code*)
-            (http-status-code http-error)))))
+            (http-status-code http-error))
+      (apply #'format
+             (simple-condition-format-control http-error)
+             (simple-condition-format-arguments http-error)))))
 
 (defmacro with-http-error-handler (&body body)
-  "Wrap BODY with an HTTP-ERROR handler."
+  "Wrap BODY with an HTTP-ERROR handler.
+
+Example usage:
+
+(hunchentoot-errors:with-http-error-handler
+  (hunchentoot-errors:http-error hunchentoot:+http-bad-request+
+                     \"Bad argument: FOO\"))
+"
   `(call-with-http-error-handler (lambda () ,@body)))
