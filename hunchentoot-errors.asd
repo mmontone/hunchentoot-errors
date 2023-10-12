@@ -11,4 +11,5 @@
   :depends-on (#:hunchentoot #:string-case #:parse-number #:cl-mimeparse)
   :components ((:file "package")
                (:file "errors-acceptor")
-               (:file "trace-acceptor")))
+               (:file "trace-acceptor")
+               (:file "http-errors")))
