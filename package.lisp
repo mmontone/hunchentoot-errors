@@ -3,6 +3,4 @@
   (:export
    #:errors-acceptor
    #:trace-acceptor
-   #:http-error
-   #:call-http-error-handler
-   #:with-http-error-handler))
+   #:http-error))
