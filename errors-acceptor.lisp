@@ -66,7 +66,8 @@
   (format stream "<div class=\"session\">")
   (format stream "<h1>Session</h1>~%<ul>")
   (loop for (key . value) in (hunchentoot::session-data session)
-        do (format stream "<li>~s: ~s~%</li>" key value))
+        do (format stream "<li>~s: <code>~s</code>~%</li>"
+                   key (hunchentoot:escape-for-html (princ-to-string value))))
   (format stream "</ul></div>"))
 
 (defun accept-format (&optional (content-type (hunchentoot:header-in "accept" *request*)))
